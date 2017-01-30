@@ -7,6 +7,10 @@ hostname can't be resolved or the host is unreachable. Can optionally be
 configured to fail if certificate is about to expire, or if it got a bad grade
 by the SSL Labs test.
 
-The python dependencies are `requests` and `prettytable`.
+The python dependencies are listed in `requirements.txt`.
 
 Run `ssl-check --help` to see a detailed list of options.
+
+There is also a docker image available as `dimrozakis/ssl-check`. Run
+
+    docker run -it --rm dimrozakis/ssl-check ssl-check --help
