@@ -30,6 +30,39 @@ log.addHandler(handler)
 log.setLevel(logging.DEBUG)
 
 
+def format_date(date, only_rel=False):
+    now = datetime.datetime.now()
+    if date > now:
+        td = date - now
+    else:
+        td = now - date
+    seconds = td.total_seconds()
+    if seconds >= 60 * 60 * 24:
+        unit = 'day'
+        value = seconds / 60 / 60 / 24
+    elif seconds >= 60 * 60:
+        unit = 'hour'
+        value = seconds / 60 / 60
+    elif seconds >= 60:
+        unit = 'minute'
+        value = seconds / 60
+    else:
+        unit = 'second'
+        value = seconds
+    rel_str = '%d %s' % (value, unit)
+    if int(value) != 1:
+        rel_str += 's'
+    if date > now:
+        rel_str = 'in %s' % rel_str
+    elif date < now:
+        rel_str = '%s ago' % rel_str
+    else:
+        rel_str = 'right now'
+    if only_rel:
+        return rel_str
+    return '%s (%s)' % (date.strftime('%Y-%m-%d %H:%M'), rel_str)
+
+
 def request(host, **kwargs):
     """Make a request to SSL Labs, optioanlly triggering new tests"""
     params = {'host': host, 'publish': 'off', 'all': 'done',
@@ -160,7 +193,8 @@ def run(hosts, max_age=0, sleep=SLEEP, times=TIMES,
                          host, grade, days)
             table.add_row([host, grade, ip_addr,
                            ', '.join(alt_names)[:64], issuer,
-                           '%s (%s)' % (expires, expires_str), msg or 'OK'])
+                           format_date(expires),
+                           msg or 'OK'])
     print
     print table
     print
