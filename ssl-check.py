@@ -117,7 +117,7 @@ def get_host_results(host, max_age=0, sleep=SLEEP, times=TIMES):
 def run(hosts, max_age=0, sleep=SLEEP, times=TIMES,
         warn_days_before=DAYS, grades=None, parallel=0):
     headers = ['host', 'grade', 'ip', 'altNames', 'issuer', 'expires',
-               'message']
+               'tested', 'message']
     table = prettytable.PrettyTable(headers)
 
     def func(host):
@@ -151,6 +151,7 @@ def run(hosts, max_age=0, sleep=SLEEP, times=TIMES,
                            result['statusMessage']])
             ok = False
             continue
+        tested = datetime.datetime.fromtimestamp(result['testTime'] / 1000)
         for endpoint in result['endpoints']:
             ip_addr = endpoint['ipAddress']
             if 'grade' not in endpoint:
@@ -194,6 +195,7 @@ def run(hosts, max_age=0, sleep=SLEEP, times=TIMES,
             table.add_row([host, grade, ip_addr,
                            ', '.join(alt_names)[:64], issuer,
                            format_date(expires),
+                           format_date(tested, only_rel=True),
                            msg or 'OK'])
     print
     print table
