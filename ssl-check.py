@@ -91,17 +91,21 @@ def run(hosts, max_age=0, sleep=SLEEP, times=TIMES,
         return get_host_results(host, max_age=max_age,
                                 sleep=sleep, times=times)
 
-    pool = multiprocessing.pool.ThreadPool(processes=parallel or len(hosts))
-    async_result = pool.map_async(func, hosts)
-    while True:
-        try:
-            results = async_result.get(1)
-        except multiprocessing.TimeoutError:
-            continue
-        except KeyboardInterrupt:
-            log.warning("Received SIGTERM, exiting")
-            return
-        break
+    threads = min(parallel, len(hosts)) if parallel else len(hosts)
+    if threads > 1:
+        pool = multiprocessing.pool.ThreadPool(processes=threads)
+        async_result = pool.map_async(func, hosts)
+        while True:
+            try:
+                results = async_result.get(1)
+            except multiprocessing.TimeoutError:
+                continue
+            except KeyboardInterrupt:
+                log.warning("Received SIGTERM, exiting")
+                return
+            break
+    else:
+        results = map(func, hosts)
     log.info("Completed polling for results")
 
     ok = True
