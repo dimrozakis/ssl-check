@@ -202,9 +202,7 @@ def run(hosts, max_age=0, sleep=SLEEP, times=TIMES,
             table.add_row([host, grade, ip_addr,
                            ', '.join(alt_names)[:64], issuer,
                            format_date(expires), tested, msg or 'OK'])
-    print
-    print table
-    print
+    log.info('\n%s\n', table)
     return ok
 
 
