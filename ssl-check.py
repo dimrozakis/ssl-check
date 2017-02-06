@@ -145,18 +145,24 @@ def run(hosts, max_age=0, sleep=SLEEP, times=TIMES,
 
     for result in results:
         host = result['host']
+        if result.get('testTime'):
+            tested = format_date(
+                datetime.datetime.fromtimestamp(result['testTime'] / 1000),
+                only_rel=True
+            )
+        else:
+            tested = 'N/A'
         if result['status'] == 'ERROR':
             log.error('%s: %s', host, result['statusMessage'])
-            table.add_row([host, 'ERROR', '', '', '', '',
+            table.add_row([host, 'ERROR', '', '', '', '', tested,
                            result['statusMessage']])
             ok = False
             continue
-        tested = datetime.datetime.fromtimestamp(result['testTime'] / 1000)
         for endpoint in result['endpoints']:
             ip_addr = endpoint['ipAddress']
             if 'grade' not in endpoint:
                 log.error('%s: %s', host, endpoint['statusMessage'])
-                table.add_row([host, 'ERROR', ip_addr, '', '', '',
+                table.add_row([host, 'ERROR', ip_addr, '', '', '', tested,
                                endpoint['statusMessage']])
                 ok = False
                 continue
@@ -194,9 +200,7 @@ def run(hosts, max_age=0, sleep=SLEEP, times=TIMES,
                          host, grade, days)
             table.add_row([host, grade, ip_addr,
                            ', '.join(alt_names)[:64], issuer,
-                           format_date(expires),
-                           format_date(tested, only_rel=True),
-                           msg or 'OK'])
+                           format_date(expires), tested, msg or 'OK'])
     print
     print table
     print
