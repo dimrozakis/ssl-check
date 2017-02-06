@@ -67,6 +67,7 @@ def request(host, **kwargs):
     """Make a request to SSL Labs, optioanlly triggering new tests"""
     params = {'host': host, 'publish': 'off', 'all': 'done',
               'ignoreMismatch': 'on'}
+    params.update(kwargs)
     resp = requests.get(API_ENDPOINT, params=params)
     if not resp.ok:
         try:
@@ -251,6 +252,7 @@ def main():
     if not ok:
         log.error("Exiting with errors")
         sys.exit(1)
+    log.info("Completed successfully")
 
 
 if __name__ == "__main__":
