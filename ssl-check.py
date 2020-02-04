@@ -86,7 +86,7 @@ def request(host, **kwargs):
 
 def get_host_results(host, max_age=0, sleep=SLEEP, times=TIMES):
     kwargs = {'maxAge': max_age} if max_age else {'startNew': 'on'}
-    for i in xrange(times):
+    for i in range(times):
         result = request(host, **kwargs)
         if result['status'] == 'ERROR':
             if not result.get('retry'):
@@ -99,7 +99,7 @@ def get_host_results(host, max_age=0, sleep=SLEEP, times=TIMES):
     else:
         return result
     kwargs.pop('startNew', None)
-    for j in xrange(times - i - 1):
+    for j in range(times - i - 1):
         if result['status'] == 'READY':
             log.info('%s: %s', host, result['status'])
             return result
